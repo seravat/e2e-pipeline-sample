@@ -104,7 +104,7 @@ pipeline {
               cloud 'openshift'
               containerTemplate {
                 name 'argo-cd-cli'
-                image 'argoproj/argocd-cli:v0.7.1'
+                image 'argoproj/argocd-cli:v0.10.6'
                 ttyEnabled true
                 command 'cat'
                 args ''
