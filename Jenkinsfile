@@ -80,24 +80,28 @@ pipeline {
 
           agent {
             node { 
-                label "maven"
+                label "argo"
             }
           }
           steps{
 
             script{
+                openshift.withCluster() {
+                    openshift.withProject( "${DEV_NAMESPACE}" ) {
+                        sh "/argocd login --grpc-web --insecure ${ARGOCD_ROUTE}:443 --username ${ARGOCD_USER} --password ${ARGOCD_PASS}"
 
-              sh "/argocd login --grpc-web --insecure ${ARGOCD_ROUTE}:443 --username ${ARGOCD_USER} --password ${ARGOCD_PASS}"
+                        sh "/argocd app create app-build \
+                            --dest-namespace james-ci-cd \
+                            --dest-server https://kubernetes.default.svc \
+                            --repo ${GIT_URL} \
+                            --path build"
 
-              sh "/argocd app create app-build \
-                  --dest-namespace james-ci-cd \
-                  --dest-server https://kubernetes.default.svc \
-                  --repo ${GIT_URL} \
-                  --path build"
-
-              sh "/argocd app sync app-build"
-              sh "/argocd app wait app-build --timeout ${appWaitTimeout}"
-            }
+                        sh "/argocd app sync app-build"
+                        sh "/argocd app wait app-build --timeout ${appWaitTimeout}"
+                        // openshift.startBuild("${APP_NAME}","--follow","--wait")
+                    }
+                }
+            } 
 
           }
         }
