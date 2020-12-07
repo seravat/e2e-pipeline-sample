@@ -51,22 +51,8 @@ podTemplate(name: "argo", label: "argo", cloud: "openshift", containers: [
 
 pipeline {
 
-    agent {
-        label "master"
-    }
-
   agent {
-    argo {
-      cloud 'openshift'
-      containerTemplate {
-        name 'argo-cd-cli'
-        image 'argoproj/argocd-cli:v0.7.1'
-        ttyEnabled true
-        command 'cat'
-        args ''
-        envVars [envVar(key: 'ARGOCD_SERVER', value: "argocdServer")] 
-      }
-    }
+      label "master"
   }
 
   environment {
@@ -114,8 +100,16 @@ pipeline {
         stage("Create ArgoCD Build Application") {
 
           agent {
-            node { 
-                label "argo"
+            argo {
+              cloud 'openshift'
+              containerTemplate {
+                name 'argo-cd-cli'
+                image 'argoproj/argocd-cli:v0.7.1'
+                ttyEnabled true
+                command 'cat'
+                args ''
+                envVars [envVar(key: 'ARGOCD_SERVER', value: "argocdServer")] 
+              }
             }
           }
           steps{
