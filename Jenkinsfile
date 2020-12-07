@@ -80,7 +80,7 @@ pipeline {
 
           agent {
             node { 
-                label "argo"
+                label "maven"
             }
           }
           steps{
