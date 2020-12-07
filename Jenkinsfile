@@ -77,15 +77,30 @@ pipeline {
         //ON THIS STAGE WE COULD CREATE AN APPLICATION IN ARGOCD TO DEPLOY YAMLS
 
         stage("Create ArgoCD Build Application") {
-
+          /* 
           agent {
             node { 
                 label "argo"
             }
           }
+          */
+
+          container('argo-cd-cli') {
+                        sh "/argocd login --grpc-web --insecure ${ARGOCD_ROUTE}:443 --username ${ARGOCD_USER} --password ${ARGOCD_PASS}"
+
+                        sh "/argocd app create app-build \
+                            --dest-namespace james-ci-cd \
+                            --dest-server https://kubernetes.default.svc \
+                            --repo ${GIT_URL} \
+                            --path build"
+
+                        sh "/argocd app sync app-build"
+                        sh "/argocd app wait app-build --timeout ${appWaitTimeout}"
+            }
+          /* 
           steps{
-
-
+            
+            script{
                 openshift.withCluster() {
                     openshift.withProject( "${DEV_NAMESPACE}" ) {
                         sh "/argocd login --grpc-web --insecure ${ARGOCD_ROUTE}:443 --username ${ARGOCD_USER} --password ${ARGOCD_PASS}"
@@ -101,8 +116,10 @@ pipeline {
                         // openshift.startBuild("${APP_NAME}","--follow","--wait")
                     }
                 }
+            } 
 
           }
+          */
         }
 
         /* 
