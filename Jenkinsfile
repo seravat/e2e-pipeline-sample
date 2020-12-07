@@ -77,7 +77,13 @@ pipeline {
         //ON THIS STAGE WE COULD CREATE AN APPLICATION IN ARGOCD TO DEPLOY YAMLS
 
         stage("Create ArgoCD Build Application") {
-          container('argo-cd-cli') {
+
+          agent {
+            node { 
+                label "argo-cd-cli"
+            }
+          }
+          steps{
 
             sh "/argocd login --grpc-web --insecure ${ARGOCD_ROUTE}:443 --username ${ARGOCD_USER} --password ${ARGOCD_PASS}"
 
