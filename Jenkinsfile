@@ -108,7 +108,6 @@ pipeline {
                 ttyEnabled true
                 command 'cat'
                 args ''
-                envVars [envVar(key: 'ARGOCD_SERVER', value: "argocdServer")] 
               }
             }
           }
