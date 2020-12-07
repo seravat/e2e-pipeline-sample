@@ -85,7 +85,7 @@ pipeline {
           }
           steps{
 
-            script{
+
                 openshift.withCluster() {
                     openshift.withProject( "${DEV_NAMESPACE}" ) {
                         sh "/argocd login --grpc-web --insecure ${ARGOCD_ROUTE}:443 --username ${ARGOCD_USER} --password ${ARGOCD_PASS}"
@@ -101,7 +101,6 @@ pipeline {
                         // openshift.startBuild("${APP_NAME}","--follow","--wait")
                     }
                 }
-            } 
 
           }
         }
