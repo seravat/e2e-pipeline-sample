@@ -120,7 +120,7 @@ pipeline {
                 git url: "${env.APPLICATION_SOURCE_REPO_URL}", branch: "${env.APPLICATION_SOURCE_REPO_REF}", credentialsId: "${GIT_CREDENTIALS_ID}"
                 
             
-                sh "/argocd login --grpc-web --insecure ${env.ARGOCD_ROUTE}:443 --username ${env.ARGOCD_USER} --password ${env.ARGOCD_PASS}"
+                sh "/argocd login --insecure ${env.ARGOCD_ROUTE}:443 --username ${env.ARGOCD_USER} --password ${env.ARGOCD_PASS}"
 
                 sh "/argocd app create app-build \
                     --dest-namespace james-ci-cd \
