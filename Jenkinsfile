@@ -61,7 +61,6 @@ pipeline {
 
         NEXUS_HOSTNAME="nexus.james-dev.svc.cluster.local"
         NEXUS_CREDS= credentials('james-ci-cd-james-nexus-secret')
-        GIT_SSL_NO_VERIFY = true
         GIT_CREDENTIALS = credentials('james-ci-cd-james-github-secret')
         GIT_CREDENTIALS_ID = "james-ci-cd-james-github-secret"
         REGISTRY_PUBLISHER_CREDENTIALS_ID = "james-ci-cd-james-nexus-secret"
