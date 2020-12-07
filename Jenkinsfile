@@ -5,7 +5,7 @@ openshift.withCluster() {
   env.DEV_NAMESPACE = "james-dev"
   env.RELEASE_NAMESPACE = "james-int-test"
   env.GIT_URL = "https://github.com/seravat/e2e-pipeline-sample"
-  env.ARGOCD_ROUTE = "https://argocd-server-argocd.hui-joao-mike-ocp-3-11-8e403d02da27f23cda259248b817e83d-0001.eu-gb.containers.appdomain.cloud"
+  env.ARGOCD_ROUTE = "argocd-server-argocd.hui-joao-mike-ocp-3-11-8e403d02da27f23cda259248b817e83d-0001.eu-gb.containers.appdomain.cloud"
   env.ARGOCD_USER = "admin"
   env.ARGOCD_PASS = "admin"
   env.appWaitTimeout = 600
@@ -75,7 +75,7 @@ pipeline {
         SYSTEM_TEST_NAMESPACE= 'james-sys-test'
 
         GIT_URL = "https://github.com/seravat/e2e-pipeline-sample"
-        ARGOCD_ROUTE = "https://argocd-server-argocd.hui-joao-mike-ocp-3-11-8e403d02da27f23cda259248b817e83d-0001.eu-gb.containers.appdomain.cloud"
+        ARGOCD_ROUTE = "argocd-server-argocd.hui-joao-mike-ocp-3-11-8e403d02da27f23cda259248b817e83d-0001.eu-gb.containers.appdomain.cloud"
         ARGOCD_USER = "admin"
         ARGOCD_PASS = "admin"
         appWaitTimeout = 600
