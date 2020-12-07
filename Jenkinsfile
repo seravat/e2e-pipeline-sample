@@ -55,10 +55,29 @@ pipeline {
 
     environment {
         GIT_SSL_NO_VERIFY = true
-        GIT_CREDENTIALS = credentials('james-ci-cd-james-github-secret')
 
         JENKINS_TAG = "${JOB_NAME}.${BUILD_NUMBER}"
         RELEASE_TAG = "release"
+
+        NEXUS_HOSTNAME="nexus.james-dev.svc.cluster.local"
+        NEXUS_CREDS= credentials('james-ci-cd-james-nexus-secret')
+        GIT_SSL_NO_VERIFY = true
+        GIT_CREDENTIALS = credentials('james-ci-cd-james-github-secret')
+        GIT_CREDENTIALS_ID = "james-ci-cd-james-github-secret"
+        REGISTRY_PUBLISHER_CREDENTIALS_ID = "james-ci-cd-james-nexus-secret"
+        APPLICATION_SOURCE_REPO_URL = 'https://github.com/seravat/james-lifecycle'
+        APPLICATION_SOURCE_REPO_REF = 'master'
+        APP_NAME = 'james-lifecycle'
+        BUILD_NAMESPACE = 'james-ci-cd'
+        DEV_NAMESPACE = 'james-dev'
+        INT_TEST_NAMESPACE= 'james-int-test'
+        SYSTEM_TEST_NAMESPACE= 'james-sys-test'
+
+        GIT_URL = "https://github.com/seravat/e2e-pipeline-sample"
+        ARGOCD_ROUTE = "https://argocd-server-argocd.hui-joao-mike-ocp-3-11-8e403d02da27f23cda259248b817e83d-0001.eu-gb.containers.appdomain.cloud"
+        ARGOCD_USER = "admin"
+        ARGOCD_PASS = "admin"
+        appWaitTimeout = 600
     }
 
     stages {
@@ -84,19 +103,32 @@ pipeline {
             }
           }
           steps{
+
+                echo '?? Create OpenShift objects using Argo...'
+
+                // Checkout code so files are available
+                echo 'Checkout application code and run ansible commands...'
+                git url: "${env.APPLICATION_SOURCE_REPO_URL}", branch: "${env.APPLICATION_SOURCE_REPO_REF}", credentialsId: "${GIT_CREDENTIALS_ID}"
+                
             
-              sh "/argocd login --grpc-web --insecure ${ARGOCD_ROUTE}:443 --username ${ARGOCD_USER} --password ${ARGOCD_PASS}"
+                sh "/argocd login --grpc-web --insecure ${env.ARGOCD_ROUTE}:443 --username ${env.ARGOCD_USER} --password ${env.ARGOCD_PASS}"
 
-              sh "/argocd app create app-build \
-                  --dest-namespace james-ci-cd \
-                  --dest-server https://kubernetes.default.svc \
-                  --repo ${GIT_URL} \
-                  --path build"
+                sh "/argocd app create app-build \
+                    --dest-namespace james-ci-cd \
+                    --dest-server https://kubernetes.default.svc \
+                    --repo ${env.GIT_URL} \
+                    --path build"
 
-              sh "/argocd app sync app-build"
-              sh "/argocd app wait app-build --timeout ${appWaitTimeout}"
-              // openshift.startBuild("${APP_NAME}","--follow","--wait")
+                sh "/argocd app sync app-build"
+                sh "/argocd app wait app-build --timeout ${env.appWaitTimeout}"
+                // openshift.startBuild("${APP_NAME}","--follow","--wait")
 
+
+          }
+          post {
+              failure {
+                  notifyBuild('FAIL')
+              }
           }
         }
 
