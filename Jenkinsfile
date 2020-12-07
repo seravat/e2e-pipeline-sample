@@ -85,7 +85,6 @@ pipeline {
           }
           steps{
             
-            script{
               sh "/argocd login --grpc-web --insecure ${ARGOCD_ROUTE}:443 --username ${ARGOCD_USER} --password ${ARGOCD_PASS}"
 
               sh "/argocd app create app-build \
@@ -97,7 +96,6 @@ pipeline {
               sh "/argocd app sync app-build"
               sh "/argocd app wait app-build --timeout ${appWaitTimeout}"
               // openshift.startBuild("${APP_NAME}","--follow","--wait")
-            } 
 
           }
         }
