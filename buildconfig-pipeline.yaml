@@ -2,11 +2,11 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: app
-    name: "app-pipeline"
+    build: app-pipeline-build
+    name: "app-pipeline-build"
     type: pipeline
-    app: "app"
-  name: "app-pipeline"
+    app: "app-pipeline-build"
+  name: "app-pipeline-build"
 spec:
   runPolicy: Serial
   source:

@@ -239,9 +239,9 @@ pipeline {
                     label "master"
                 }
             }
-            /*when {
+            when {
                 environment name: 'PROMOTE_TO_RELEASE', value: 'yes'
-            }*/
+            }
             steps {
                     echo 'Promoting Container Image to Release'
                     script {
