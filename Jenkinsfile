@@ -104,7 +104,7 @@ pipeline {
               cloud 'openshift'
               containerTemplate {
                 name 'argo-cd-cli'
-                image 'argoproj/argocd-cli:v0.10.6'
+                image 'argoproj/argocd-cli:v0.7.1'
                 ttyEnabled true
                 command 'cat'
                 args ''
@@ -116,20 +116,22 @@ pipeline {
                 echo '?? Create OpenShift objects using Argo...'
 
                 // Checkout code so files are available
-                echo 'Checkout application code and run ansible commands...'
+                echo 'Checkout application code...'
                 git url: "${env.APPLICATION_SOURCE_REPO_URL}", branch: "${env.APPLICATION_SOURCE_REPO_REF}", credentialsId: "${GIT_CREDENTIALS_ID}"
                 
-            
+                echo 'Argo Login...'
                 sh "/argocd login --insecure ${env.ARGOCD_ROUTE}:443 --username ${env.ARGOCD_USER} --password ${env.ARGOCD_PASS}"
 
+                echo 'Argo Create Application...'
                 sh "/argocd app create app-build \
                     --dest-namespace james-ci-cd \
                     --dest-server https://kubernetes.default.svc \
                     --repo ${env.GIT_URL} \
                     --path build"
 
-                sh "/argocd app sync app-build"
-                sh "/argocd app wait app-build --timeout ${env.appWaitTimeout}"
+                echo 'Argo Create Application...'
+                //sh "/argocd app sync app-build"
+                //sh "/argocd app wait app-build --timeout ${env.appWaitTimeout}"
                 // openshift.startBuild("${APP_NAME}","--follow","--wait")
 
 
