@@ -4,7 +4,7 @@ openshift.withCluster() {
   env.BUILD_NAMESPACE = "dev"
   env.DEV_NAMESPACE = "dev"
   env.RELEASE_NAMESPACE = "release"
-  env.GIT_URL = "https://github.com/welshstew/e2e-pipeline-sample"
+  env.GIT_URL = "https://github.com/seravat/e2e-pipeline-sample"
   echo "Starting Pipeline for ${APP_NAME}..."
 }
 
@@ -42,7 +42,7 @@ pipeline {
 
     environment {
         GIT_SSL_NO_VERIFY = true
-        GIT_CREDENTIALS = credentials('cicd-github-secret')
+        GIT_CREDENTIALS = credentials('james-ci-cd-james-github-secret')
 
         JENKINS_TAG = "${JOB_NAME}.${BUILD_NUMBER}"
         RELEASE_TAG = "release"
