@@ -1,10 +1,14 @@
 openshift.withCluster() {
   env.APP_NAME = "nodejs-sample"
-  env.PIPELINES_NAMESPACE = "cicd"
-  env.BUILD_NAMESPACE = "dev"
-  env.DEV_NAMESPACE = "dev"
-  env.RELEASE_NAMESPACE = "release"
+  env.PIPELINES_NAMESPACE = "james-cicd"
+  env.BUILD_NAMESPACE = "james-cicd"
+  env.DEV_NAMESPACE = "james-dev"
+  env.RELEASE_NAMESPACE = "james-int-test"
   env.GIT_URL = "https://github.com/seravat/e2e-pipeline-sample"
+  env.ARGOCD_ROUTE = "https://argocd-server-argocd.hui-joao-mike-ocp-3-11-8e403d02da27f23cda259248b817e83d-0001.eu-gb.containers.appdomain.cloud"
+  env.ARGOCD_USER = "admin"
+  env.ARGOCD_PASS = "admin"
+  env.appWaitTimeout = 600
   echo "Starting Pipeline for ${APP_NAME}..."
 }
 
@@ -34,6 +38,15 @@ def notifyBuild(String buildStatus = 'STARTED') {
 //   slackSend (color: colorCode, message: summary)
 }
 
+podTemplate(name: ptNameVersion, label: ptNameVersion, containers: [
+    containerTemplate(name: 'builder', image: 'golang:1.10.3', ttyEnabled: true, command: 'cat', args: ''),
+    containerTemplate(name: 'docker', image: 'docker:17.09', ttyEnabled: true, command: 'cat', args: '' ),
+    containerTemplate(name: 'argo-cd-tools', image: 'argoproj/argo-cd-tools:latest', ttyEnabled: true, command: 'cat', args: '', envVars:[envVar(key: 'GIT_SSH_COMMAND', value: 'ssh -o StrictHostKeyChecking=no')] ),
+    containerTemplate(name: 'argo-cd-cli', image: 'argoproj/argocd-cli:v0.7.1', ttyEnabled: true, command: 'cat', args: '', envVars:[envVar(key: 'ARGOCD_SERVER', value: argocdServer)] ),
+    ],
+    volumes: [hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')]
+  )
+
 pipeline {
 
     agent {
@@ -61,6 +74,26 @@ pipeline {
             }
         }
         
+        //ON THIS STAGE WE COULD CREATE AN APPLICATION IN ARGOCD TO DEPLOY YAMLS
+
+        stage("Create ArgoCD Build Application") {
+          container('argo-cd-cli') {
+
+            sh "/argocd login --grpc-web --insecure ${ARGOCD_ROUTE}:443 --username ${ARGOCD_USER} --password ${ARGOCD_PASS}"
+
+            sh "/argocd app create app-build \
+                --dest-namespace james-ci-cd \
+                --dest-server https://kubernetes.default.svc \
+                --repo ${GIT_URL} \
+                --path build"
+
+            sh "/argocd app sync app-build"
+            sh "/argocd app wait app-build --timeout ${appWaitTimeout}"
+
+          }
+        }
+
+        /* 
         stage("Create OpenShift objects in DEV") {
             agent {
                 node { 
@@ -82,6 +115,7 @@ pipeline {
                 }
             }
         }
+        */
       
         stage('Build') {
             agent {
@@ -111,6 +145,7 @@ pipeline {
             }
         }
 
+        /* 
         stage('Deploy to DEV') {
             agent {
                 node { 
@@ -196,7 +231,7 @@ pipeline {
                 }
             }
         }
-        */  
+
  
         stage("Promote to RELEASE") {
             agent {
@@ -333,5 +368,6 @@ pipeline {
                 }
             }
         }
+        */
     }
 }

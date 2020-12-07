@@ -1,0 +1,24 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    build: app
+    name: "app-pipeline"
+    type: pipeline
+    app: "app"
+  name: "app-pipeline"
+spec:
+  runPolicy: Serial
+  source:
+    git:
+      ref: "master"
+      uri: "https://github.com/seravat/e2e-pipeline-sample"
+    type: Git
+    sourceSecret:
+      name: james-github-secret
+  strategy:
+    jenkinsPipelineStrategy:
+      jenkinsfilePath: Jenkinsfile
+    type: JenkinsPipeline
+  triggers:
+  - type: ConfigChange

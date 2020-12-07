@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  annotations:
+    description: Defines how to build the application
+    template.alpha.openshift.io/wait-for-ready: "true"
+  name: nodejs-sample
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: nodejs-sample:latest
+  source:
+    contextDir: /nodejs-ex
+    git:
+      ref: master
+      uri: https://github.com/seravat/e2e-pipeline-sample
+    type: Git
+    sourceSecret:
+      name: "james-github-secret"
+  strategy:
+    sourceStrategy:
+      env:
+      - name: NPM_MIRROR
+        value: ''
+      from:
+        kind: ImageStreamTag
+        name: nodejs:8
+        namespace: openshift
+    type: Source
+  triggers:
+  - type: ImageChange
