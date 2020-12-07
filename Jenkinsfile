@@ -100,7 +100,7 @@ pipeline {
         stage("Create ArgoCD Build Application") {
 
           agent {
-            argo {
+            kubernetes {
               cloud 'openshift'
               containerTemplate {
                 name 'argo-cd-cli'
